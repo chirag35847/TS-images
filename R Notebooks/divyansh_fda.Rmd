@@ -1,0 +1,54 @@
+---
+title: "divyansh"
+output: html_document
+---
+
+## Top-down Approach
+Top-down approaches involve first generating forecasts for the Total series y_t, and then disaggregating these down the hierarchy.
+
+Let p_1,\dots,p_{m} denote a set of disaggregation proportions which determine how the forecasts of the Total series are to be distributed to obtain forecasts for each series at the bottom level of the structure. For example, for the hierarchy of below figure, using proportions p_1,\dots,p_{5}, we get
+
+```{=tex}
+\begin{align*}
+\ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.
+\end{align*}
+```
+
+![Hierarchical Tree Diagram](add path to hierarchical tree diagram)
+
+
+## Top-down Methods
+# Average historical proportions
+```{=tex}
+\begin{align*}
+p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
+\end{align*}
+```
+
+for j=1,\dots,m. Each proportion reflects the average of the historical proportions of the bottom-level series y_{j,t} over the period t=1,\dots,T relative to the total aggregate y_t.
+
+# Proportions of the historical averages
+```{=tex}
+\begin{align*}
+p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
+\end{align*}
+```
+
+for j=1,\dots,m.Each proportion p_j captures the average historical value of the bottom-level series y_{j,t} relative to the average value of the total aggregate y_t.
+
+# Forecast proportions
+
+```{=tex}
+\begin{align*}
+p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}.
+\end{align*}
+```
+
+where j=1,2,\dots,m,\hat{y}_{j,h}^{(\ell)} is the h-step-ahead initial forecast of the series that corresponds to the node which is \ell levels above j, and \hat{S}_{j,h}^{(\ell)} is the sum of the h-step-ahead initial forecasts below the node that is \ell levels above node j and are directly connected to that node. These forecast proportions disaggregate the h-step-ahead initial forecast of the Total series to get h-step-ahead coherent forecasts of the bottom-level series.
+
+
+#Middle-out approach
+
+The middle-out approach combines bottom-up and top-down approaches.
+
+First, a “middle” level is chosen and forecasts are generated for all the series at this level. For the series above the middle level, coherent forecasts are generated using the bottom-up approach by aggregating the “middle-level” forecasts upwards. For the series below the “middle level”, coherent forecasts are generated using a top-down approach by disaggregating the “middle level” forecasts downwards.

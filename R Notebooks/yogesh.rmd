@@ -1,0 +1,97 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Single level approaches
+
+Forecasts of hierarchical or grouped time series involved selecting one level of aggregation and generating forecasts for that level.
+
+It involves
+
+Selecting one level of aggregation and generating forecasts for that level.
+
+Then for obtaining set of coherent forecasts for the rest of the structure these forecasts are
+
+-   Aggregated for higher levels
+-   Dis-aggregated for lower levels
+
+## Bottom-up Approach
+
+A simple method for generating coherent forecasts
+
+This approach involves first generating forecasts for each series at the **bottom level**, and then summing these to produce forecasts for all the series in the structure.
+
+```{=tex}
+\begin{align*}
+  \hat{y}_{AA,h}, ~~\hat{y}_{AB,h}, ~~\hat{y}_{AC,h}, ~~\hat{y}_{BA,h} ~~\text{and} ~~\hat{ y}_{BB,h}
+\end{align*}
+```
+Summing these, we get ℎ-step-ahead coherent forecasts for the rest of the series:
+
+```{=tex}
+\begin{align*}
+  \tilde{y}_{h} & =\hat{y}_{AA,h}+\hat{y}_{AB,h}
++\hat{y}_{AC,h}+\hat{y}_{BA,h}+\hat{y}_{BB,h}, \\
+  \tilde{y}_{A,h} & = \hat{y}_{AA,h}+\hat{y}_{AB,h}+\hat{y}_{AC,h}, \\
+\text{and}\quad
+  \tilde{y}_{B,h} & = \hat{y}_{BA,,h}+\hat{y}_{BB,h}
+\end{align*}
+```
+For this approach:
+
+-   no information is lost due to aggregation
+
+-   bottom-level data can be quite noisy and more challenging to model and forecast.
+
+## Example: Generating bottom-up forecasts
+
+Aim - national and state forecasts for the Australian tourism data without
+
+disaggregations using regions or the purpose of travel
+
+```{r}
+library(fpp3)
+tourism
+```
+
+```{r}
+tourism_states <- tourism |>
+  aggregate_key(State, Trips = sum(Trips))
+tourism_states
+```
+
+```{r}
+
+fcasts_state <- tourism_states |>
+  filter(!is_aggregated(State)) |>
+  model(ets = ETS(Trips)) |>
+  forecast()
+
+# Sum bottom-level forecasts to get top-level forecasts
+fcasts_national <- fcasts_state |>
+  summarise(value = sum(Trips), .mean = mean(value))
+```
+
+```{r}
+tourism_states |>
+  model(ets = ETS(Trips)) |>
+  reconcile(bu = bottom_up(ets)) |>
+  forecast()
+```
+
+#### Workflow for forecasting aggregation structures
+
+```{r}
+data |> aggregate_key() |> model() |>  reconcile() |> forecast()
+```
+
+1.  Begin with a `tsibble` object (here labelled `data`) containing the individual bottom-level series.
+
+2.  Define in `aggregate_key()` the aggregation structure and build a `tsibble` object that also contains the aggregate series.
+
+3.  Identify a `model()` for each series, at all levels of aggregation.
+
+4.  Specify in `reconcile()` how the coherent forecasts are to be generated from the selected models.
+
+5.  Use the `forecast()` function to generate forecasts for the whole aggregation structure.
