@@ -1,16 +1,29 @@
-**Forecasting hierarchical and grouped time series**
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
-What is hierarchical and grouped time series?
+# Forecasting hierarchical and grouped time series
 
-Lets understand this with an example. We can have time series which have many other time series nested inside it, we categorize these into 3 categories
+## What is hierarchical and grouped time series?
+
+Lets understand this with an example. We can have time series which have
+many other time series nested inside it, we categorize these into 3
+categories
 
 -   Hierarchical Time Series
 -   Grouped time series
 -   Mixed hierarchical and grouped structure
 
-For example : Sale of Hybrid bikes can be divided into city, commuting, comfort, various types of bikes.
+For example : Sale of Hybrid bikes can be divided into city, commuting,
+comfort, various types of bikes.
 
-**- Hierarchical happens when we want to split the data into city, state, country** ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
+## Hierarchical Time Series
+
+-   Hierarchical happens when we want to split the data into city,
+    state, country
+    ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
 
 $$
 y_t = y_{AA,t}+y_{AB,t}+y_{AC,t}+y_{BA,t}+y_{BB,t}
@@ -24,9 +37,13 @@ $$
   y_{B,t} = y_{BA,t} + y_{BB,t} 
 $$
 
-As we can see from the above equations, that if we sum up the bottom level of the hierarchy and compare it with a level up, it will be the same
+As we can see from the above equations, that if we sum up the bottom
+level of the hierarchy and compare it with a level up, it will be the
+same
 
-Let us understand this with an example from Australian tourism This data has, quarterly domestic tourism demand, measured as the number of overnight trips Australians spend away from the home.
+Let us understand this with an example from Australian tourism This data
+has, quarterly domestic tourism demand, measured as the number of
+overnight trips Australians spend away from the home.
 
 ```{r 1}
 library('fpp3')
@@ -45,7 +62,8 @@ tourism <- tsibble::tourism |>
   ))
 ```
 
-Now the function `aggregate_key()` can create hierarchical time series from bottom level ie, from states to the country
+Now the function `aggregate_key()` can create hierarchical time series
+from bottom level ie, from states to the country
 
 Let's try it out
 
@@ -76,15 +94,20 @@ tourism_hts |>
   labs(y = "Trips ('000)")
 ```
 
-From this graph we can understand, that in Queensland and Northern Territory, the tourism is on peak in Winter, In case of Southern states like Victoria and Tasmania tourism is high in Summer months
+From this graph we can understand, that in Queensland and Northern
+Territory, the tourism is on peak in Winter, In case of Southern states
+like Victoria and Tasmania tourism is high in Summer months
 
 ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/tourismRegions-1.png)
 
-This plot shows us the things going onn within states and with some series showing strong trends or seasonality, some showing contrasting seasonality, while some series appear to be just noise.
+This plot shows us the things going onn within states and with some
+series showing strong trends or seasonality, some showing contrasting
+seasonality, while some series appear to be just noise.
 
-**- Grouped time series**
+## Grouped time series
 
-Now lets understand grouped time series This type of time series comes into place where is no general hierarchical trend.
+Now lets understand grouped time series This type of time series comes
+into place where is no general hierarchical trend.
 
 For example : Business trips and Vacation Trips
 
@@ -96,11 +119,9 @@ $$
 
 $$
 y_{A,t} = y_{AX,t}+y_{AY,t}
-$$
-$$
+$$ $$
 y_{BX,t} = y_{BX,t}+y_{BY,t}
-$$
-$$
+$$ $$
 y_{X,t} = y_{AX,t}+y_{BX,t}
 $$
 
@@ -108,9 +129,11 @@ $$
 y_{Y,t} = y_{AY,t}+y_{BY,t}
 $$
 
-If we total up for all the series the last ones, we get the same if we would have totaled up at one level up
+If we total up for all the series the last ones, we get the same if we
+would have totaled up at one level up
 
-Let us understand this with an example Lets take australian prison data. We have un-grouped this into - Gender - State - Legal Status
+Let us understand this with an example Lets take australian prison data.
+We have un-grouped this into - Gender - State - Legal Status
 
 ```{r 6}
 prison <- readr::read_csv("https://raw.githubusercontent.com/chirag35847/TS-images/main/prison_population.csv") |>
@@ -155,28 +178,39 @@ prison_gts |>
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-**Mixed hierarchical and grouped structure** When the data is both nested and crossed, For example : Purpose of travel : holiday, business, visiting family etc The same can be also divided geographically in hierarchical.
+## Mixed hierarchical and grouped structure
 
-We use `aggregate_key` and follow the following syntax. Now `tourism_full` contains 425 series, where 85 are hierarchical, and 340 are crossed
+When the data is both nested and crossed, For example : Purpose of
+travel : holiday, business, visiting family etc The same can be also
+divided geographically in hierarchical.
+
+We use `aggregate_key` and follow the following syntax. Now
+`tourism_full` contains 425 series, where 85 are hierarchical, and 340
+are crossed
 
 ```{r 10}
 tourism_full <- tourism |>
   aggregate_key((State/Region) * Purpose, Trips = sum(Trips))
 ```
 
-Lets look at the country's purpose of traverlling ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/mixed-purpose-1.png)
+Lets look at the country's purpose of traverlling
+![](https://raw.githubusercontent.com/chirag35847/TS-images/main/mixed-purpose-1.png)
 
-Now lets look at statwise purpose of travel ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/mixed-state-purpose-1.png)
+Now lets look at statwise purpose of travel
+![](https://raw.githubusercontent.com/chirag35847/TS-images/main/mixed-state-purpose-1.png)
 
 # Single level approaches
 
-Forecasts of hierarchical or grouped time series involved selecting one level of aggregation and generating forecasts for that level.
+Forecasts of hierarchical or grouped time series involved selecting one
+level of aggregation and generating forecasts for that level.
 
 It involves
 
-Selecting one level of aggregation and generating forecasts for that level.
+Selecting one level of aggregation and generating forecasts for that
+level.
 
-Then for obtaining set of coherent forecasts for the rest of the structure these forecasts are
+Then for obtaining set of coherent forecasts for the rest of the
+structure these forecasts are
 
 -   Aggregated for higher levels
 -   Dis-aggregated for lower levels
@@ -185,14 +219,17 @@ Then for obtaining set of coherent forecasts for the rest of the structure these
 
 A simple method for generating coherent forecasts
 
-This approach involves first generating forecasts for each series at the **bottom level**, and then summing these to produce forecasts for all the series in the structure.
+This approach involves first generating forecasts for each series at the
+**bottom level**, and then summing these to produce forecasts for all
+the series in the structure.
 
 ```{=tex}
 \begin{align*}
   \hat{y}_{AA,h}, ~~\hat{y}_{AB,h}, ~~\hat{y}_{AC,h}, ~~\hat{y}_{BA,h} ~~\text{and} ~~\hat{ y}_{BB,h}
 \end{align*}
 ```
-Summing these, we get ℎ-step-ahead coherent forecasts for the rest of the series:
+Summing these, we get ℎ-step-ahead coherent forecasts for the rest of
+the series:
 
 ```{=tex}
 \begin{align*}
@@ -207,11 +244,13 @@ For this approach:
 
 -   no information is lost due to aggregation
 
--   bottom-level data can be quite noisy and more challenging to model and forecast.
+-   bottom-level data can be quite noisy and more challenging to model
+    and forecast.
 
 ## Example: Generating bottom-up forecasts
 
-Aim - national and state forecasts for the Australian tourism data without
+Aim - national and state forecasts for the Australian tourism data
+without
 
 disaggregations using regions or the purpose of travel
 
@@ -254,28 +293,38 @@ tourism_states |>
       reconcile() |> 
       forecast()
 
-1.  Begin with a `tsibble` object (here labelled `data`) containing the individual bottom-level series.
+1.  Begin with a `tsibble` object (here labelled `data`) containing the
+    individual bottom-level series.
 
-2.  Define in `aggregate_key()` the aggregation structure and build a `tsibble` object that also contains the aggregate series.
+2.  Define in `aggregate_key()` the aggregation structure and build a
+    `tsibble` object that also contains the aggregate series.
 
 3.  Identify a `model()` for each series, at all levels of aggregation.
 
-4.  Specify in `reconcile()` how the coherent forecasts are to be generated from the selected models.
+4.  Specify in `reconcile()` how the coherent forecasts are to be
+    generated from the selected models.
 
-5.  Use the `forecast()` function to generate forecasts for the whole aggregation structure.
+5.  Use the `forecast()` function to generate forecasts for the whole
+    aggregation structure.
 
 # Top-down Approach
 
-Top-down approaches involve first generating forecasts for the Total series $y_t$, and then disaggregating these down the hierarchy.
+Top-down approaches involve first generating forecasts for the Total
+series $y_t$, and then disaggregating these down the hierarchy.
 
-Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which determine how the forecasts of the Total series are to be distributed to obtain forecasts for each series at the bottom level of the structure. For example, for the hierarchy of below figure, using proportions $p_1,...,p_{5}$, we get
+Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which
+determine how the forecasts of the Total series are to be distributed to
+obtain forecasts for each series at the bottom level of the structure.
+For example, for the hierarchy of below figure, using proportions
+$p_1,...,p_{5}$, we get
 
 ```{=tex}
 \begin{align*}
 \tilde{AA}{t}=p_1\hat{y}_t,~~~\tilde{AB}{t}=p_2\hat{y}_t,~~~\tilde{AC}{t}=p_3\hat{y}_t,~~~\tilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\tilde{BB}{t}=p_5\hat{y}_t.
 \end{align*}
 ```
-![Hierarchical Tree Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
+![Hierarchical Tree
+Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
 
 ## Top-down Methods
 
@@ -286,7 +335,9 @@ Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which determine h
 p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
 \end{align*}
 ```
-for $j=1,\dots,m$. Each proportion reflects the average of the historical proportions of the bottom-level series\$ y\_{j,t}\$ over the period \$ t=1,\dots,T\$ relative to the total aggregate y_t.
+for $j=1,\dots,m$. Each proportion reflects the average of the
+historical proportions of the bottom-level series\$ y\_{j,t}\$ over the
+period \$ t=1,\dots,T\$ relative to the total aggregate y_t.
 
 ### Proportions of the historical averages
 
@@ -295,7 +346,9 @@ for $j=1,\dots,m$. Each proportion reflects the average of the historical propor
 p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
 \end{align*}
 ```
-for $j=1,...,m$. Each proportion $p_j$ captures the average historical value of the bottom-level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
+for $j=1,...,m$. Each proportion $p_j$ captures the average historical
+value of the bottom-level series $y_{j,t}$ relative to the average value
+of the total aggregate $y_t$.
 
 ### Forecast proportions
 
@@ -304,7 +357,14 @@ for $j=1,...,m$. Each proportion $p_j$ captures the average historical value of 
 p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}.
 \end{align*}
 ```
-where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial forecast of the series that corresponds to the node which is $\ell$ levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the h-step-ahead initial forecasts below the node that is $\ell$ levels above node j and are directly connected to that node. These forecast proportions dis-aggregate the h-step-ahead initial forecast of the Total series to get h-step-ahead coherent forecasts of the bottom-level series.
+where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial
+forecast of the series that corresponds to the node which is $\ell$
+levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the
+h-step-ahead initial forecasts below the node that is $\ell$ levels
+above node j and are directly connected to that node. These forecast
+proportions dis-aggregate the h-step-ahead initial forecast of the Total
+series to get h-step-ahead coherent forecasts of the bottom-level
+series.
 
 ## Advantage
 1. Simplicity: One only needs to model and generate forecasts for the most aggregated top-level series.
@@ -317,11 +377,19 @@ one disadvantage is the loss of information due to aggregation. we are unable to
 
 The middle-out approach combines bottom-up and top-down approaches.
 
-First, a "middle" level is chosen and forecasts are generated for all the series at this level. For the series above the middle level, coherent forecasts are generated using the bottom-up approach by aggregating the "middle-level" forecasts upwards. For the series below the "middle level", coherent forecasts are generated using a top-down approach by disaggregating the "middle level" forecasts downwards.
+First, a "middle" level is chosen and forecasts are generated for all
+the series at this level. For the series above the middle level,
+coherent forecasts are generated using the bottom-up approach by
+aggregating the "middle-level" forecasts upwards. For the series below
+the "middle level", coherent forecasts are generated using a top-down
+approach by disaggregating the "middle level" forecasts downwards.
 
 # Forecast Recolination
 
-The equations we seen till now, we can represented using the matrix notation. The bottom-level series' aggregation is determined by a n m matrix S, often known as the "summing matrix," which is created for each aggregation structure.
+The equations we seen till now, we can represented using the matrix
+notation. The bottom-level series' aggregation is determined by a n m
+matrix S, often known as the "summing matrix," which is created for each
+aggregation structure.
 
 ![Example1](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
 
@@ -362,7 +430,10 @@ or we can represent that into very small equation: $$
 \end{equation}
 $$
 
-where y t is an n-dimensional vector of all the observations in the hierarchy at time t, S is the summing matrix, and b t is an m-dimensional vector of all the observations at the lowest level of the hierarchy at time t. The first row of the summation matrix S reflects $$
+where y t is an n-dimensional vector of all the observations in the
+hierarchy at time t, S is the summing matrix, and b t is an
+m-dimensional vector of all the observations at the lowest level of the
+hierarchy at time t. The first row of the summation matrix S reflects $$
 \begin{equation}
   y_{t}=y{AA}{t}+y{AB}{t}+y{AC}{t}+y{BA}{t}+y{BB}{t},
 \end{equation}
@@ -372,9 +443,12 @@ $$
 \begin{equation}
   y{A}{t}=y{AA}{t}+y{AB}{t}+y{AC}{t}\qquad \text{and} \qquad  y{B}{t}=y{BA}{t}+y{BB}{t}.
 \end{equation}
-$$ . The rows below these form an m-dimensional identity matrix I m, with each bottom-level observation on the right side of the equation equal to itself on the left side.
+$$ . The rows below these form an m-dimensional identity matrix I m,
+with each bottom-level observation on the right side of the equation
+equal to itself on the left side.
 
-Similarly,for the given figure ![example 2](https://raw.githubusercontent.com/chirag35847/TS-images/main/GroupTree-1.png)
+Similarly,for the given figure ![example
+2](https://raw.githubusercontent.com/chirag35847/TS-images/main/GroupTree-1.png)
 
 The given matrix is as follows: $$
 \begin{bmatrix}
@@ -422,11 +496,16 @@ $$ and the fourth and fifth rows represent $$
 \end{equation}
 $$.
 
-This matrix notation enables us to use a single notation to express all forecasting methods for hierarchical or clustered time series.
+This matrix notation enables us to use a single notation to express all
+forecasting methods for hierarchical or clustered time series.
 
-Assume we anticipate all series without regard for any aggregation limitations. These are the basic predictions, and they are denoted by $\hat{{y}}_h$, where h is the forecast horizon. They are stacked in the same sequence as the data ${y}_t.$
+Assume we anticipate all series without regard for any aggregation
+limitations. These are the basic predictions, and they are denoted by
+$\hat{{y}}_h$, where h is the forecast horizon. They are stacked in the
+same sequence as the data ${y}_t.$
 
-Hence, for either hierarchical or grouped systems, all coherent forecasting techniques may be described as
+Hence, for either hierarchical or grouped systems, all coherent
+forecasting techniques may be described as
 
 ```{=tex}
 \begin{equation} 
@@ -434,9 +513,13 @@ Hence, for either hierarchical or grouped systems, all coherent forecasting tech
   
 \end{equation}
 ```
-where G is a matrix that transfers the base forecasts to the bottom level and S sums them together using the aggregation structure to obtain a set of coherent forecasts $\tilde{{y}}_h$.
+where G is a matrix that transfers the base forecasts to the bottom
+level and S sums them together using the aggregation structure to obtain
+a set of coherent forecasts $\tilde{{y}}_h$.
 
-The G matrix is defined in accordance with the technique used. For example, if the bottom-up technique is applied to anticipate the example 1 hierarchy, then $$
+The G matrix is defined in accordance with the technique used. For
+example, if the bottom-up technique is applied to anticipate the example
+1 hierarchy, then $$
 {G}=
   \begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
@@ -447,7 +530,10 @@ The G matrix is defined in accordance with the technique used. For example, if t
   \end{bmatrix}
 $$.
 
-Take note that G has two partitions. The first three columns zero out the series' base forecasts above the bottom level, while the m-dimensional identity matrix selects just the bottom level's base forecasts. The S matrix then adds them all together.
+Take note that G has two partitions. The first three columns zero out
+the series' base forecasts above the bottom level, while the
+m-dimensional identity matrix selects just the bottom level's base
+forecasts. The S matrix then adds them all together.
 
 If one of the top-down approach was adopted, $$
 {G}=
@@ -460,11 +546,19 @@ If one of the top-down approach was adopted, $$
     \end{bmatrix}.
 $$
 
-The first column contains the set of proportions that allocate the top level's base predictions to the lower level. The S matrix then adds them all together. The remaining columns subtract the base projections from the highest degree of aggregation.
+The first column contains the set of proportions that allocate the top
+level's base predictions to the lower level. The S matrix then adds them
+all together. The remaining columns subtract the base projections from
+the highest degree of aggregation.
 
-The G matrix for a middle out strategy will be a hybrid of the two above. The base predictions of a pre-selected level will be disaggregated to the bottom level using a set of proportions, all other base forecasts will be wiped out, and the bottom-level forecasts will then be summed up the hierarchy using the summing matrix.
+The G matrix for a middle out strategy will be a hybrid of the two
+above. The base predictions of a pre-selected level will be
+disaggregated to the bottom level using a set of proportions, all other
+base forecasts will be wiped out, and the bottom-level forecasts will
+then be summed up the hierarchy using the summing matrix.
 
 ------------------------------------------------------------------------
+
 ```{=tex}
 \begin{equation}
   \tilde{y}_h={SG}\hat{y}_h,
@@ -584,9 +678,14 @@ user and crucial for modelling.
 
 ## 11.4 Forecasting Australian domestic tourism
 
-We will compute forecasts for the Australian tourism data . We use the data up to the end of 2015 as a training set, withholding the final two years (eight quarters, 2016Q1--2017Q4) as a test set for evaluation. The code below demonstrates the full workflow for generating coherent forecasts using the bottom-up, OLS and MinT methods.
+We will compute forecasts for the Australian tourism data . We use the
+data up to the end of 2015 as a training set, withholding the final two
+years (eight quarters, 2016Q1--2017Q4) as a test set for evaluation. The
+code below demonstrates the full workflow for generating coherent
+forecasts using the bottom-up, OLS and MinT methods.
 
-The accuracy of the forecasts over the test set can be evaluated using the accuracy() function. We summarise some results using RMSE and MASE.
+The accuracy of the forecasts over the test set can be evaluated using
+the accuracy() function. We summarise some results using RMSE and MASE.
 
 ```{r 19}
 tourism_full <- tourism |>
@@ -644,9 +743,14 @@ fc |>
 
 ## 11.5 Reconciled distributional forecasts
 
-Reconciled distributional forecasts are a type of probabilistic forecasting that involve reconciling or combining multiple individual forecasts, each with their own distributional assumptions, into a single coherent forecast with a distributional assumption that reflects the information from all the individual forecasts.
+Reconciled distributional forecasts are a type of probabilistic
+forecasting that involve reconciling or combining multiple individual
+forecasts, each with their own distributional assumptions, into a single
+coherent forecast with a distributional assumption that reflects the
+information from all the individual forecasts.
 
-we will focus on two fundamental results that are implemented in the `reconcile()` function.
+we will focus on two fundamental results that are implemented in the
+`reconcile()` function.
 
 1.  If the base forecasts are normally distributed,
 
@@ -668,17 +772,36 @@ where, S = Summing matrix
 
 G = Reconciliation matrix
 
-2)  When the assumption of normality is not reasonable for the base forecasts:
+2)  When the assumption of normality is not reasonable for the base
+    forecasts:
 
-    we can use a non-parametric approach such as bootstrapping to generate a large number of possible future sample paths from the model(s) that produce the base forecasts. These sample paths represent a range of possible future outcomes based on the underlying model(s) and provide a way to estimate the distribution of the forecast errors.
+    we can use a non-parametric approach such as bootstrapping to
+    generate a large number of possible future sample paths from the
+    model(s) that produce the base forecasts. These sample paths
+    represent a range of possible future outcomes based on the
+    underlying model(s) and provide a way to estimate the distribution
+    of the forecast errors.
 
-    Once the sample paths are generated, we can then reconcile them using a reconciliation method such as hierarchical forecasting or Bayesian model averaging. This involves adjusting the individual sample paths to ensure that they are consistent with each other and with any known constraints or relationships between the variables being forecasted.
+    Once the sample paths are generated, we can then reconcile them
+    using a reconciliation method such as hierarchical forecasting or
+    Bayesian model averaging. This involves adjusting the individual
+    sample paths to ensure that they are consistent with each other and
+    with any known constraints or relationships between the variables
+    being forecasted.
 
-    After the sample paths are reconciled, we can compute coherent prediction intervals that reflect the uncertainty in the reconciled forecast. One way to do this is to compute quantiles of the reconciled sample paths at each future point in time.
+    After the sample paths are reconciled, we can compute coherent
+    prediction intervals that reflect the uncertainty in the reconciled
+    forecast. One way to do this is to compute quantiles of the
+    reconciled sample paths at each future point in time.
 
-    For example, if we generate 1,000 reconciled sample paths, we can compute the 2.5th and 97.5th percentiles of the sample paths at each future point to obtain a 95% prediction interval.
+    For example, if we generate 1,000 reconciled sample paths, we can
+    compute the 2.5th and 97.5th percentiles of the sample paths at each
+    future point to obtain a 95% prediction interval.
 
-    This approach allows us to account for the non-normality of the forecast errors and to incorporate the information from the base forecasts into a single, coherent forecast that reflects the collective knowledge and information of the individual forecasts.
+    This approach allows us to account for the non-normality of the
+    forecast errors and to incorporate the information from the base
+    forecasts into a single, coherent forecast that reflects the
+    collective knowledge and information of the individual forecasts.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -686,7 +809,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 11.6 Forecasting Australian prison population
 
-Returning to the Australian prison population data (Section 11.1), we will compare the forecasts from bottom-up and MinT methods applied to base ETS models
+Returning to the Australian prison population data (Section 11.1), we
+will compare the forecasts from bottom-up and MinT methods applied to
+base ETS models
 
 ```{r}
 
@@ -749,6 +874,10 @@ fc |>
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
+![](https://raw.githubusercontent.com/chirag35847/TS-images/main/Last_narendra.PNG)
+
+![](https://raw.githubusercontent.com/chirag35847/TS-images/main/narendra%202.png)
+
 ```{r}
 
 fc |>
@@ -765,5 +894,3 @@ fc |>
 ```
 
 ![](https://raw.githubusercontent.com/chirag35847/TS-images/main/lol.PNG)
-
-![](https://raw.githubusercontent.com/chirag35847/TS-images/main/Last_narendra.PNG)
