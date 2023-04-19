@@ -264,7 +264,7 @@ tourism_states |>
 
 5.  Use the `forecast()` function to generate forecasts for the whole aggregation structure.
 
-## Top-down Approach
+# Top-down Approach
 
 Top-down approaches involve first generating forecasts for the Total series $y_t$, and then disaggregating these down the hierarchy.
 
@@ -279,7 +279,7 @@ Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which determine h
 
 ## Top-down Methods
 
-# Average historical proportions
+### Average historical proportions
 
 ```{=tex}
 \begin{align*}
@@ -288,7 +288,7 @@ p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
 ```
 for $j=1,\dots,m$. Each proportion reflects the average of the historical proportions of the bottom-level series\$ y\_{j,t}\$ over the period \$ t=1,\dots,T\$ relative to the total aggregate y_t.
 
-# Proportions of the historical averages
+### Proportions of the historical averages
 
 ```{=tex}
 \begin{align*}
@@ -297,7 +297,7 @@ p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
 ```
 for $j=1,...,m$. Each proportion $p_j$ captures the average historical value of the bottom-level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
 
-# Forecast proportions
+### Forecast proportions
 
 ```{=tex}
 \begin{align*}
@@ -305,6 +305,13 @@ p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}.
 \end{align*}
 ```
 where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial forecast of the series that corresponds to the node which is $\ell$ levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the h-step-ahead initial forecasts below the node that is $\ell$ levels above node j and are directly connected to that node. These forecast proportions dis-aggregate the h-step-ahead initial forecast of the Total series to get h-step-ahead coherent forecasts of the bottom-level series.
+
+## Advantage
+1. Simplicity: One only needs to model and generate forecasts for the most aggregated top-level series.
+2. In general, it produces quite reliable forecasts for the aggregate levels and they are useful with low count data.
+
+## Disadvantage
+one disadvantage is the loss of information due to aggregation. we are unable to capture and take advantage of individual series characteristics such as time dynamics, special events, different seasonal patterns, etc.
 
 # Middle-out approach
 
