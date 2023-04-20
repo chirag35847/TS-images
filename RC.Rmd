@@ -315,7 +315,7 @@ Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which determine h
 
 ```{=tex}
 \begin{align*}
-\ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.
+\tilde{y}_{AA,t}=p_1\hat{y}_t,~~~\tilde{y}_{AB,t}=p_2\hat{y}_t,~~~\tilde{y}_{AC,t}=p_3\hat{y}_t,~~~\tilde{y}_{BA,t}=p_4\hat{y}_t~~~\text{and}~~~~~~\tilde{y}_{BB,t}=p_5\hat{y}_t.
 \end{align*}
 ```
 
