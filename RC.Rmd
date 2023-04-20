@@ -309,22 +309,17 @@ tourism_states |>
 
 # Top-down Approach
 
-Top-down approaches involve first generating forecasts for the Total
-series $y_t$, and then disaggregating these down the hierarchy.
+Top-down approaches involve first generating forecasts for the Total series $y_t$, and then disaggregating these down the hierarchy.
 
-Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which
-determine how the forecasts of the Total series are to be distributed to
-obtain forecasts for each series at the bottom level of the structure.
-For example, for the hierarchy of below figure, using proportions
-$p_1,...,p_{5}$, we get
+Let $p_1,...,p_{m}$ denote a set of disaggregation proportions which determine how the forecasts of the Total series are to be distributed to obtain forecasts for each series at the bottom level of the structure. For example, for the hierarchy of below figure, using proportions $p_1,...,p_{5}$, we get
 
 ```{=tex}
 \begin{align*}
-\tilde{AA}{t}=p_1\hat{y}_t,~~~\tilde{AB}{t}=p_2\hat{y}_t,~~~\tilde{AC}{t}=p_3\hat{y}_t,~~~\tilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\tilde{BB}{t}=p_5\hat{y}_t.
+\ytilde{AA}{t}=p_1\hat{y}_t,~~~\ytilde{AB}{t}=p_2\hat{y}_t,~~~\ytilde{AC}{t}=p_3\hat{y}_t,~~~\ytilde{BA}{t}=p_4\hat{y}_t~~~\text{and}~~~~~~\ytilde{BB}{t}=p_5\hat{y}_t.
 \end{align*}
 ```
-![Hierarchical Tree
-Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
+
+Top-down forecasts can be generated using top_down() within the reconcile() function
 
 ## Top-down Methods
 
@@ -335,9 +330,9 @@ Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
 p_j=\frac{1}{T}\sum_{t=1}^{T}\frac{y_{j,t}}{{y_t}}
 \end{align*}
 ```
-for $j=1,\dots,m$. Each proportion reflects the average of the
-historical proportions of the bottom-level series\$ y\_{j,t}\$ over the
-period \$ t=1,\dots,T\$ relative to the total aggregate y_t.
+for $j=1,\dots,m$. Each proportion reflects the average of the historical proportions of the bottom-level series $y_{j,t}$ over the period $t=1,\dots,T$ relative to the total aggregate $y_t$.
+
+This approach is implemented in the top_down() function by setting method = "average_proportions"
 
 ### Proportions of the historical averages
 
@@ -346,25 +341,22 @@ period \$ t=1,\dots,T\$ relative to the total aggregate y_t.
 p_j={\sum_{t=1}^{T}\frac{y_{j,t}}{T}}\Big/{\sum_{t=1}^{T}\frac{y_t}{T}}
 \end{align*}
 ```
-for $j=1,...,m$. Each proportion $p_j$ captures the average historical
-value of the bottom-level series $y_{j,t}$ relative to the average value
-of the total aggregate $y_t$.
+for $j=1,...,m$. Each proportion $p_j$ captures the average historical value of the bottom-level series $y_{j,t}$ relative to the average value of the total aggregate $y_t$.
+
+This approach is implemented in the top_down() function by setting method = "proportion_averages".
 
 ### Forecast proportions
+
+![Hierarchical Tree Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
 
 ```{=tex}
 \begin{align*}
 p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}.
 \end{align*}
 ```
-where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial
-forecast of the series that corresponds to the node which is $\ell$
-levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the
-h-step-ahead initial forecasts below the node that is $\ell$ levels
-above node j and are directly connected to that node. These forecast
-proportions dis-aggregate the h-step-ahead initial forecast of the Total
-series to get h-step-ahead coherent forecasts of the bottom-level
-series.
+where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial forecast of the series that corresponds to the node which is $\ell$ levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the h-step-ahead initial forecasts below the node that is $\ell$ levels above node j and are directly connected to that node. These forecast proportions dis-aggregate the h-step-ahead initial forecast of the Total series to get h-step-ahead coherent forecasts of the bottom-level series.
+
+This approach is implemented in the top_down() function by setting method = "forecast_proportions". It is the default method.
 
 ## Advantage
 1. Simplicity: One only needs to model and generate forecasts for the most aggregated top-level series.
@@ -377,12 +369,7 @@ one disadvantage is the loss of information due to aggregation. we are unable to
 
 The middle-out approach combines bottom-up and top-down approaches.
 
-First, a "middle" level is chosen and forecasts are generated for all
-the series at this level. For the series above the middle level,
-coherent forecasts are generated using the bottom-up approach by
-aggregating the "middle-level" forecasts upwards. For the series below
-the "middle level", coherent forecasts are generated using a top-down
-approach by disaggregating the "middle level" forecasts downwards.
+First, a "middle" level is chosen and forecasts are generated for all the series at this level. For the series above the middle level, coherent forecasts are generated using the bottom-up approach by aggregating the "middle-level" forecasts upwards. For the series below the "middle level", coherent forecasts are generated using a top-down approach by disaggregating the "middle level" forecasts downwards.
 
 # Forecast Recolination
 
