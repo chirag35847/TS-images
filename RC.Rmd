@@ -347,7 +347,9 @@ This approach is implemented in the top_down() function by setting method = "pro
 
 ### Forecast proportions
 
-![Hierarchical Tree Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
+Consider a one level hierarchy. We first generate h-step-ahead forecasts for all of the series. We don’t use these forecasts directly, and they are not coherent (they don’t add up correctly). Let’s call these “initial” forecasts. We calculate the proportion of each h-step-ahead initial forecast at the bottom level, to the aggregate of all the h-step-ahead initial forecasts at this level. We refer to these as the forecast proportions, and we use them to disaggregate the top-level h-step-ahead initial forecast in order to generate coherent forecasts for the whole of the hierarchy.
+
+For a  K-level hierarchy, this process is repeated for each node, going from the top to the bottom level. Applying this process leads to the following general rule for obtaining the forecast proportions:
 
 ```{=tex}
 \begin{align*}
@@ -355,6 +357,43 @@ p_j=\prod^{K-1}_{\ell=0}\frac{\hat{y}_{j,h}^{(\ell)}}{\hat{S}_{j,h}^{(\ell+1)}}.
 \end{align*}
 ```
 where $j=1,2,...,m,\hat{y}_{j,h}^{(\ell)}$ is the h-step-ahead initial forecast of the series that corresponds to the node which is $\ell$ levels above j, and $\hat{S}{j,h}^{(\ell)}$ is the sum of the h-step-ahead initial forecasts below the node that is $\ell$ levels above node j and are directly connected to that node. These forecast proportions dis-aggregate the h-step-ahead initial forecast of the Total series to get h-step-ahead coherent forecasts of the bottom-level series.
+
+![Hierarchical Tree Diagram](https://raw.githubusercontent.com/chirag35847/TS-images/main/hts.png)
+
+Let us use the hierarchy of above figure to explain this notation and to demonstrate how this general rule is reached. Assume we have generated initial forecasts for each series in the hierarchy. Recall that for the top-level “Total” series, $\tilde{y}_{h}=\hat{y}_{h}$, for any top-down approach. Here are some examples using the above notation:
+
+$\hat{y}_{\text{A},h}^{(1)}=\hat{y}_{\text{B},h}^{(1)}=\hat{y}_{h}= \tilde{y}_{h}$
+$\hat{y}_{\text{AA},h}^{(1)}=\hat{y}_{\text{AB},h}^{(1)}=\hat{y}_{\text{AC},h}^{(1)}= \hat{y}_{\text{A},h}$
+$\hat{y}_{\text{AA},h}^{(2)}=\hat{y}_{\text{AB},h}^{(2)}=\hat{y}_{\text{AC},h}^{(2)}=\hat{y}_{\text{BA},h}^{(2)}= \hat{y}_{\text{BB},h}^{(2)}=\hat{y}_{h}= \tilde{y}_{h}$
+$\hat{s}_{AA,h}^{(1)} = \hat{s}_{AB,h}^{(1)}= \hat{s}_{AC,h}^{(1)}= \hat{y}_{AA,h}+\hat{y}_{AB,h}+\hat{y}_{AC,h}$
+$\hat{s}_{AA,h}^{(2)} = \hat{s}_{AB,h}^{(2)}= \hat{s}_{AC,h}^{(2)}= \hat{s}_{A,h}^{(1)} = \hat{s}_{B,h}^{(1)}= \hat{S}_{h}= \hat{y}_{A,h}+\hat{y}_{B,h}$
+
+Moving down the farthest left branch of the hierarchy, coherent forecasts are given by
+```{=tex}
+\begin{align*}
+\tilde{y}_{A,h} = \Bigg(\frac{\hat{y}_{A,h}}{\hat{s}_{A,h}^{(1)}}\Bigg) \tilde{y}_{h} =
+  \Bigg(\frac{\hat{y}_{AA,h}^{(1)}}{\hat{s}_{AA,h}^{(2)}}\Bigg) \tilde{y}_{h}
+\end{align*}
+```
+
+and
+
+```{=tex}
+\begin{align*}
+\tilde{y}_{AA,h} = \Bigg(\frac{\hat{y}_{AA,h}}{\hat{s}_{AA,h}^{(1)}}\Bigg) \tilde{y}_{A,h}
+  =\Bigg(\frac{\hat{y}_{AA,h}}{\hat{s}_{AA,h}^{(1)}}\Bigg) \Bigg(\frac{\hat{y}_{AA,h}^{(1)}}{\hat{s}_{AA,h}^{(2)}}\Bigg)\tilde{y}_{h}.
+\end{align*}
+```
+
+Consequently,
+
+```{=tex}
+\begin{align*}
+p_{1}=\Bigg(\frac{\hat{y}_{AA,h}}{\hat{s}_{AA,h}^{1}}\Bigg) \Bigg(\frac{\hat{y}{AA,h}^{(1)}}{\hat{s}_{AA,h}^{(2)}}\Bigg).
+\end{align*}
+```
+
+The other proportions can be obtained similarly.
 
 This approach is implemented in the top_down() function by setting method = "forecast_proportions". It is the default method.
 
